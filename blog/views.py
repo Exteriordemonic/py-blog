@@ -1,6 +1,11 @@
-from django.shortcuts import render
+from typing import Any
+
+
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView
 from blog.models import Post
+from blog.forms import CommentaryForm
 
 
 # Create your views here.
@@ -14,3 +19,33 @@ class IndexView(ListView):
 class PostDetailView(DetailView):
     model = Post
     context_object_name = "post"
+    form_class = CommentaryForm
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "blog:post-detail", kwargs={"pk": self.kwargs["pk"]}
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.form_class(
+            user=self.request.user, post=self.get_object()
+        )
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(
+            request.POST, user=request.user, post=self.get_object()
+        )
+        if form.is_valid():
+            form.save()
+            return redirect(self.get_success_url())
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related("comments", "comments__user")
+        )

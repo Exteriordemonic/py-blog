@@ -78,7 +78,7 @@ class PostDetailTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.context["post"], self.post)
         self.assertEqual(
-            list(response.context["post"].coments.all()), [self.commentary]
+            list(response.context["post"].comments.all()), [self.commentary]
         )
 
     def test_view_add_commentary(self):
@@ -86,6 +86,6 @@ class PostDetailTestCase(TestCase):
         response = self.client.post(self.url, {"content": "BodyCommentary2"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Commentary.objects.count(), 2)
-        self.assertEqual(Commentary.objects.last().content, "BodyCommentary2")
-        self.assertEqual(Commentary.objects.last().user, self.user)
-        self.assertEqual(Commentary.objects.last().post, self.post)
+        self.assertEqual(Commentary.objects.first().content, "BodyCommentary2")
+        self.assertEqual(Commentary.objects.first().user, self.user)
+        self.assertEqual(Commentary.objects.first().post, self.post)

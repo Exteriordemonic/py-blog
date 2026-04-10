@@ -25,14 +25,15 @@ class Commentary(models.Model):
     content = models.TextField()
     created_time = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(
-        to=User, on_delete=models.CASCADE, related_name="coments"
+        to=User, on_delete=models.CASCADE, related_name="comments"
     )
     post = models.ForeignKey(
-        to=Post, on_delete=models.CASCADE, related_name="coments"
+        to=Post, on_delete=models.CASCADE, related_name="comments"
     )
 
     class Meta:
         verbose_name_plural = "Commentaries"
+        ordering = ["-created_time"]
 
     def __str__(self) -> str:
         return self.content

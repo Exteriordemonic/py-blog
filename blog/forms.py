@@ -4,6 +4,10 @@ from blog.models import Commentary
 
 
 class CommentaryForm(forms.ModelForm):
+    content = forms.CharField(
+        label="Content", widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+
     def __init__(self, *args, user=None, post=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
