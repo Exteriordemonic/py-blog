@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView
 from blog.models import Post
 from blog.forms import CommentaryForm
+from django.db.models import Count
 
 
 # Create your views here.
@@ -20,7 +21,7 @@ class IndexView(ListView):
             super()
             .get_queryset()
             .select_related("owner")
-            .prefetch_related("comments", "comments__user")
+            .annotate(comments_count=Count("comments"))
         )
 
 
