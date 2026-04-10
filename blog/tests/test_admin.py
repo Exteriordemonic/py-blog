@@ -1,24 +1,40 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.contrib.admin.sites import AdminSite
 from django.shortcuts import reverse
 
 
-from blog.models import Post
-from blog.models import Commentary
+from blog.admin import PostAdmin, CommentaryAdmin
+from blog.models import Post, Commentary
+
+
+class MockRequest:
+    pass
 
 
 class PostAdminTestCase(TestCase):
     def setUp(self):
+        self.site = AdminSite()
+        self.admin = PostAdmin(Post, self.site)
+
         self.user = get_user_model().objects.create_superuser(
             username="admin", password="adminpass", email="admin@example.com"
         )
         self.author = get_user_model().objects.create_user(
             username="Author1", password="password1"
         )
+        self.author2 = get_user_model().objects.create_user(
+            username="Author2", password="password2"
+        )
         self.client.force_login(self.user)
         self.post = Post.objects.create(
             title="Title1", content="Body1", owner=self.author
         )
+        self.post2 = Post.objects.create(
+            title="Title2", content="Body2", owner=self.author2
+        )
+
+        self.request = MockRequest()
 
     def test_admin_changelist_view(self):
         url = reverse("admin:blog_post_changelist")
@@ -32,6 +48,22 @@ class PostAdminTestCase(TestCase):
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_search_by_title(self):
+        qs, _ = self.admin.get_search_results(
+            self.request, Post.objects.all(), "Title1"
+        )
+
+        self.assertIn(self.post, qs)
+        self.assertNotIn(self.post2, qs)
+
+    def test_search_by_owner_username(self):
+        qs, _ = self.admin.get_search_results(
+            self.request, Post.objects.all(), "Author1"
+        )
+
+        self.assertIn(self.post, qs)
+        self.assertNotIn(self.post2, qs)
 
 
 class CommentaryAdminTestCase(TestCase):
