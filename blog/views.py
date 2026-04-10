@@ -19,6 +19,7 @@ class IndexView(ListView):
         return (
             super()
             .get_queryset()
+            .select_related("owner")
             .prefetch_related("comments", "comments__user")
         )
 
