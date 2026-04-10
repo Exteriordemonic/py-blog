@@ -12,7 +12,7 @@ class CommentaryFormTest(TestCase):
             username="testuser", password="password"
         )
         self.post = Post.objects.create(
-            title="Test Post", content="Lorem ipsum", user=self.user
+            title="Test Post", content="Lorem ipsum", owner=self.user
         )
 
     def test_commentary_form_valid(self):
