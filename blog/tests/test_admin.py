@@ -87,6 +87,14 @@ class CommentaryAdminTestCase(TestCase):
         self.commentary2 = Commentary.objects.create(
             content="BodyCommentary2", user=self.user, post=self.post
         )
+        self.post_other = Post.objects.create(
+            title="OtherPost", content="Other", owner=self.author
+        )
+        self.commentary_on_other_post = Commentary.objects.create(
+            content="CommentOnOtherPost",
+            user=self.author,
+            post=self.post_other,
+        )
 
         self.request = MockRequest()
 
@@ -122,3 +130,21 @@ class CommentaryAdminTestCase(TestCase):
 
         self.assertIn(self.commentary, qs)
         self.assertNotIn(self.commentary2, qs)
+
+    def test_changelist_filter_by_user(self):
+        url = reverse("admin:blog_commentary_changelist")
+        response = self.client.get(
+            url, {"user__id__exact": str(self.author.pk)}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "BodyCommentary1")
+        self.assertContains(response, "CommentOnOtherPost")
+        self.assertNotContains(response, "BodyCommentary2")
+
+    def test_changelist_filter_by_post(self):
+        url = reverse("admin:blog_commentary_changelist")
+        response = self.client.get(url, {"post__id__exact": str(self.post.pk)})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "BodyCommentary1")
+        self.assertContains(response, "BodyCommentary2")
+        self.assertNotContains(response, "CommentOnOtherPost")
