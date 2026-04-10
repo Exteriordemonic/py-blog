@@ -22,6 +22,7 @@ class IndexView(ListView):
             .get_queryset()
             .select_related("owner")
             .annotate(comments_count=Count("comments"))
+            .order_by("-created_time")
         )
 
 
