@@ -14,6 +14,9 @@ class Post(models.Model):
         to=User, on_delete=models.CASCADE, related_name="posts"
     )
 
+    class Meta:
+        ordering = ["-created_time"]
+
     def __str__(self) -> str:
         return self.title
 
