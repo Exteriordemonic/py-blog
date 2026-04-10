@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from blog.models import Post
+from blog.models import Post, Commentary
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -36,7 +36,7 @@ class IndexTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(
             list(response.context["posts"]),
-            list(Post.objects.all().order_by("-created_time")),
+            list(Post.objects.all().order_by("-created_time")[:5]),
         )
 
     def test_view_paginated_correctly(self):
@@ -55,3 +55,26 @@ class IndexTestCase(TestCase):
 
         page_titles = [post.title for post in response.context["posts"]]
         self.assertEqual(page_titles, titles_on_second_page)
+
+
+class PostDetailTestCase(TestCase):
+    def setUp(self):
+        self.url = reverse("blog:post-detail", args=[1])
+        self.user = User.objects.create_user(
+            username="User1", password="Password1"
+        )
+        self.post = Post.objects.create(
+            title="Title1", content="Body1", owner=self.user
+        )
+        self.commentary = Commentary.objects.create(
+            content="BodyCommentary1", user=self.user, post=self.post
+        )
+
+    def test_view_returns_200(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_post_detail(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.context["post"], self.post)
+        self.assertEqual(response.context["commentaries"], [self.commentary])
