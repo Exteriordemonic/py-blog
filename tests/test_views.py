@@ -37,6 +37,12 @@ class PostListTest(TestCase):
         for post in post_context:
             self.assertContains(response, post.owner.username)
 
+    def test_main_page_show_post_coments_cound(self):
+        response = self.client.get(MAIN_PAGE_URL)
+        post_context = response.context["posts"]
+        for post in post_context:
+            self.assertContains(response, f"Comments: {post.comments.count()}")
+
 
 class PostDetailTest(TestCase):
     fixtures = [
