@@ -46,8 +46,12 @@ class IndexTestCase(TestCase):
     def test_view_pagination_page_2(self):
         response = self.client.get(self.url, {"page": 2})
         self.assertEqual(len(response.context["posts"]), 5)
-        self.assertEqual(response.context["posts"][0].title, "Title6")
-        self.assertEqual(response.context["posts"][1].title, "Title7")
-        self.assertEqual(response.context["posts"][2].title, "Title8")
-        self.assertEqual(response.context["posts"][3].title, "Title9")
-        self.assertEqual(response.context["posts"][4].title, "Title10")
+
+        all_posts = list(Post.objects.all())
+        ordered_posts = sorted(
+            all_posts, key=lambda x: x.created_time, reverse=True
+        )
+        titles_on_second_page = [post.title for post in ordered_posts[5:10]]
+
+        page_titles = [post.title for post in response.context["posts"]]
+        self.assertEqual(page_titles, titles_on_second_page)
