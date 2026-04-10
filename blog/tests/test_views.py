@@ -77,4 +77,6 @@ class PostDetailTestCase(TestCase):
     def test_view_post_detail(self):
         response = self.client.get(self.url)
         self.assertEqual(response.context["post"], self.post)
-        self.assertEqual(response.context["commentaries"], [self.commentary])
+        self.assertEqual(
+            list(response.context["post"].coments.all()), [self.commentary]
+        )
