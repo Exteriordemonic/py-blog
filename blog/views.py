@@ -15,6 +15,13 @@ class IndexView(ListView):
     context_object_name = "posts"
     paginate_by = 5
 
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related("comments", "comments__user")
+        )
+
 
 class PostDetailView(DetailView):
     model = Post
