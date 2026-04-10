@@ -1,10 +1,19 @@
 from django.test import TestCase
 from blog.models import Post
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 
 
 class PostTestCase(TestCase):
     def setUp(self):
-        self.post = Post.objects.create(title="Title1", content="Body1")
+        self.user = User.objects.create_user(
+            username="User1", password="Password1"
+        )
+        self.post = Post.objects.create(
+            title="Title1", content="Body1", owner=self.user
+        )
 
     def test_post_str(self):
-        self.assertEqual(self.post.__str__, "Title1")
+        self.assertEqual(self.post.__str__(), "Title1")
