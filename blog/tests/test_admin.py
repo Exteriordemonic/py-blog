@@ -88,6 +88,8 @@ class CommentaryAdminTestCase(TestCase):
             content="BodyCommentary2", user=self.user, post=self.post
         )
 
+        self.request = MockRequest()
+
     def test_admin_changelist_view(self):
         url = reverse("admin:blog_commentary_changelist")
         response = self.client.get(url)
@@ -107,7 +109,7 @@ class CommentaryAdminTestCase(TestCase):
 
     def test_search_by_content(self):
         qs, _ = self.admin.get_search_results(
-            self.request, Post.objects.all(), "BodyCommentary1"
+            self.request, Commentary.objects.all(), "BodyCommentary1"
         )
 
         self.assertIn(self.commentary, qs)
@@ -115,7 +117,7 @@ class CommentaryAdminTestCase(TestCase):
 
     def test_search_by_owner_username(self):
         qs, _ = self.admin.get_search_results(
-            self.request, Post.objects.all(), "Author1"
+            self.request, Commentary.objects.all(), "Author1"
         )
 
         self.assertIn(self.commentary, qs)

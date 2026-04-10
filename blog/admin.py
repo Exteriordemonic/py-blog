@@ -16,3 +16,4 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Commentary)
 class CommentaryAdmin(admin.ModelAdmin):
     list_display = ["content", "user"]
+    search_fields = ["content", "user__username"]
