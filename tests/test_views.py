@@ -31,6 +31,12 @@ class PostListTest(TestCase):
             list(post_list[: len(post_context)]),
         )
 
+    def test_main_page_show_author_name(self):
+        response = self.client.get(MAIN_PAGE_URL)
+        post_context = response.context["posts"]
+        for post in post_context:
+            self.assertContains(response, post.owner.username)
+
 
 class PostDetailTest(TestCase):
     fixtures = [
