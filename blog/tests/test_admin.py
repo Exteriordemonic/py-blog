@@ -20,7 +20,7 @@ class PostAdminTestCase(TestCase):
         )
 
     def test_admin_changelist_view(self):
-        url = reverse("admin:post_changelist")
+        url = reverse("admin:blog_post_changelist")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Title1")
