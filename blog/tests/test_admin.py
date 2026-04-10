@@ -68,6 +68,9 @@ class PostAdminTestCase(TestCase):
 
 class CommentaryAdminTestCase(TestCase):
     def setUp(self):
+        self.site = AdminSite()
+        self.admin = CommentaryAdmin(Commentary, self.site)
+
         self.user = get_user_model().objects.create_superuser(
             username="admin", password="adminpass", email="admin@example.com"
         )
@@ -80,6 +83,9 @@ class CommentaryAdminTestCase(TestCase):
         self.client.force_login(self.user)
         self.commentary = Commentary.objects.create(
             content="BodyCommentary1", user=self.author, post=self.post
+        )
+        self.commentary2 = Commentary.objects.create(
+            content="BodyCommentary2", user=self.user, post=self.post
         )
 
     def test_admin_changelist_view(self):
@@ -98,3 +104,19 @@ class CommentaryAdminTestCase(TestCase):
         url = reverse("admin:blog_commentary_changelist")
         response = self.client.get(url)
         self.assertContains(response, "Commentaries")
+
+    def test_search_by_content(self):
+        qs, _ = self.admin.get_search_results(
+            self.request, Post.objects.all(), "BodyCommentary1"
+        )
+
+        self.assertIn(self.commentary, qs)
+        self.assertNotIn(self.commentary2, qs)
+
+    def test_search_by_owner_username(self):
+        qs, _ = self.admin.get_search_results(
+            self.request, Post.objects.all(), "Author1"
+        )
+
+        self.assertIn(self.commentary, qs)
+        self.assertNotIn(self.commentary2, qs)
