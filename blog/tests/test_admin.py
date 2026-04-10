@@ -61,3 +61,8 @@ class CommentaryAdminTestCase(TestCase):
         url = reverse("admin:blog_commentary_add")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_admin_plural_name_displayed(self):
+        url = reverse("admin:blog_commentary_changelist")
+        response = self.client.get(url)
+        self.assertContains(response, "Commentaries")

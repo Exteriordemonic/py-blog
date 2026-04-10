@@ -26,5 +26,8 @@ class Commentary(models.Model):
         to=Post, on_delete=models.CASCADE, related_name="coments"
     )
 
+    class Meta:
+        verbose_name_plural = "Commentaries"
+
     def __str__(self) -> str:
         return self.content
