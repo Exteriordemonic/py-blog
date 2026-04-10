@@ -11,9 +11,11 @@ admin.site.unregister(Group)
 class PostAdmin(admin.ModelAdmin):
     list_display = ["title", "owner"]
     search_fields = ["title", "owner__username"]
+    filtering_fields = ["owner"]
 
 
 @admin.register(Commentary)
 class CommentaryAdmin(admin.ModelAdmin):
     list_display = ["content", "user"]
     search_fields = ["content", "user__username"]
+    list_filter = ["post", "user"]
